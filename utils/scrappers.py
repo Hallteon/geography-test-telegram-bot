@@ -39,5 +39,5 @@ async def countries_scrapper():
 
         data[title.text.strip()] = names
 
-    print(data)
+    return data
 

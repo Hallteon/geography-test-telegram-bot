@@ -1,2 +1,2 @@
-from . import other_commands
-from . import standart_commands
+from . import testing_handlers
+from . import standart_handlers

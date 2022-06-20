@@ -1,5 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
+
+from filters import IsInStatesGroup
 from loader import dp, bot
 
 

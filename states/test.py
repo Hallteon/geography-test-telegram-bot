@@ -2,6 +2,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
 class Test(StatesGroup):
+    start = State()
     Q1 = State()
     Q2 = State()
     Q3 = State()
@@ -12,3 +13,4 @@ class Test(StatesGroup):
     Q8 = State()
     Q9 = State()
     Q10 = State()
+    result = State()

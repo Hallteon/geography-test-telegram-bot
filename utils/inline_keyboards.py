@@ -5,12 +5,12 @@ from aiogram.utils.callback_data import CallbackData
 
 from data.continents_data import continents_data
 
-data = continents_data
+geo_data = continents_data
 
 choice_callback_data = CallbackData("choice_continent", "continent")
 question_callback_data = CallbackData("question", "type", "capital")
 
-continents = list(data.keys())
+continents = list(geo_data.keys())
 
 main_menu = InlineKeyboardMarkup()
 main_menu.insert(InlineKeyboardButton(text="Выбрать континент 🏔", callback_data="choice"))
@@ -36,7 +36,10 @@ async def create_question_menu(country, countries):
     capital = countries[country]
     capitals = []
 
-    for country in random.sample(list(countries.keys()), 2):
+    other_countris = countries.copy()
+    del other_countris[country]
+
+    for country in random.sample(list(other_countris.keys()), 3):
         capitals.append(countries[country])
 
     capitals.append(capital)

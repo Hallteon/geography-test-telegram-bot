@@ -8,9 +8,7 @@ from states import Test
 class IsInStatesGroup(BoundFilter):
 
     async def check(self, callback: types.CallbackQuery, state: FSMContext):
-        state_name = await state.get_state()
-
-        return state_name in Test.all_states_names[1:]
+        return state in Test.all_states[1:]
 
 
 

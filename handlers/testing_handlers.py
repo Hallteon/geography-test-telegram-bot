@@ -42,7 +42,7 @@ async def start_test(callback: types.CallbackQuery, state: FSMContext):
     await Test.next()
 
 
-@dp.callback_query_handler(text="back")
+@dp.callback_query_handler(state=Test.Q1, text="back")
 async def back_to_menu(callback: types.CallbackQuery, state: FSMContext):
     await choice_continent(callback)
 
@@ -87,7 +87,6 @@ async def incorrect_question(callback: types.CallbackQuery, state: FSMContext):
 
     country = data_test["country"]
     right_capital = data_test["countries"][country]
-    wrong_capital = callback.data.split(":")[2]
 
     await callback.message.edit_text(f"<b>Вы ответили неправильно ❌.\n{right_capital} - "
                                      f"столица страны {country}.</b>")

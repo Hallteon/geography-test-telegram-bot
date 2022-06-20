@@ -8,7 +8,7 @@ from data.continents_data import continents_data
 geo_data = continents_data
 
 choice_callback_data = CallbackData("choice_continent", "continent")
-question_callback_data = CallbackData("question", "type", "capital")
+question_callback_data = CallbackData("question", "type")
 
 continents = list(geo_data.keys())
 
@@ -49,11 +49,11 @@ async def create_question_menu(country, countries):
     for variant in capitals:
         if variant == capital:
             question_menu.add(InlineKeyboardButton(text=variant, callback_data=question_callback_data.new(
-                type="correct", capital=variant
+                type="correct"
             )))
         else:
             question_menu.add(InlineKeyboardButton(text=variant, callback_data=question_callback_data.new(
-                type="incorrect", capital=variant
+                type="incorrect"
             )))
 
     return question_menu

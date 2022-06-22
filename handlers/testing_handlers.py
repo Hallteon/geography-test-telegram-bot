@@ -2,25 +2,34 @@ import random
 
 from aiogram.dispatcher import FSMContext
 
-from filters import IsInStatesGroup
+from utils.create_flages_emojies import create_flag
 from utils.inline_keyboards import main_menu, choice_menu, geo_data, next_menu, create_question_menu, start_menu
+
 from aiogram import types
 from aiogram.dispatcher.filters import Command
-from loader import dp, storage
+from loader import dp
 
 from states import Test
+from utils.throttling import rate_limit
 
 
+@rate_limit(5)
 @dp.message_handler(Command("test"))
 async def bot_test(message: types.Message):
-    await message.answer(f"Чтобы пройти тест по столицам стран, выберите континент 🏝\n",
+    await message.answer(f"<b>Нажмите на первую кнопку для выбора континента 🏝\n"
+                         f"На вторую для выхода из теста 📝</b>",
                          reply_markup=main_menu)
+
+
+@dp.callback_query_handler(text="exit")
+async def exit_from_test(callback: types.CallbackQuery):
+    await callback.message.delete()
 
 
 @dp.callback_query_handler(text="choice")
 async def choice_continent(callback: types.CallbackQuery):
-    await callback.message.edit_text("Выберите континент, по столицам странам которого "
-                                     "будет проводиться тест 🏝")
+    await callback.message.edit_text("<b>Выберите континент, по столицам странам которого "
+                                     "будет проводиться тест</b> 📝")
     await callback.message.edit_reply_markup(reply_markup=choice_menu)
 
     await Test.first()
@@ -42,7 +51,7 @@ async def start_test(callback: types.CallbackQuery, state: FSMContext):
     await Test.next()
 
 
-@dp.callback_query_handler(state=Test.Q1, text="back")
+@dp.callback_query_handler(text="back", state=Test.Q1)
 async def back_to_menu(callback: types.CallbackQuery, state: FSMContext):
     await choice_continent(callback)
 
@@ -55,7 +64,7 @@ async def start_question(callback: types.CallbackQuery, state: FSMContext):
 
     country = str(random.choice(list(all_countries.keys())))
 
-    await callback.message.edit_text(f"<b>Выберите столицу страны: {country}.</b>")
+    await callback.message.edit_text(f"Выберите столицу страны: <b>{country}</b> {await create_flag(country)}")
     await callback.message.edit_reply_markup(reply_markup=await create_question_menu(country, all_countries))
 
     async with state.proxy() as data:
@@ -65,15 +74,15 @@ async def start_question(callback: types.CallbackQuery, state: FSMContext):
     await Test.next()
 
 
-@dp.callback_query_handler(state=Test.all_states[1:], text_contains="question:correct")
+@dp.callback_query_handler(text_contains="question:correct", state=Test.all_states[1:])
 async def correct_question(callback: types.CallbackQuery, state: FSMContext):
     data_test = await state.get_data()
 
     country = data_test['country']
     capital = data_test['countries'][country]
 
-    await callback.message.edit_text(f"<b>Вы ответили правильно ✅.\n{capital} - "
-                                     f"столица страны {country}.</b>")
+    await callback.message.edit_text(f"<b>Вы ответили правильно</b> ✅\n<b>{capital}</b> - "
+                                     f"столица страны <b>{country}</b> {await create_flag(country)}")
     await callback.message.edit_reply_markup(reply_markup=next_menu)
 
     async with state.proxy() as data:
@@ -81,15 +90,15 @@ async def correct_question(callback: types.CallbackQuery, state: FSMContext):
         data["correct"] += 1
 
 
-@dp.callback_query_handler(state=Test.all_states[1:], text_contains="question:incorrect")
+@dp.callback_query_handler(text_contains="question:incorrect", state=Test.all_states[1:])
 async def incorrect_question(callback: types.CallbackQuery, state: FSMContext):
     data_test = await state.get_data()
 
     country = data_test["country"]
     right_capital = data_test["countries"][country]
 
-    await callback.message.edit_text(f"<b>Вы ответили неправильно ❌.\n{right_capital} - "
-                                     f"столица страны {country}.</b>")
+    await callback.message.edit_text(f"<b>Вы ответили неправильно</b> ❌\n<b>{right_capital}</b> - "
+                                     f"столица страны <b>{country}</b> {await create_flag(country)}")
     await callback.message.edit_reply_markup(reply_markup=next_menu)
 
     async with state.proxy() as data:
@@ -104,13 +113,13 @@ async def return_results(callback: types.CallbackQuery, state: FSMContext):
     correct_questions = data_test["correct"]
 
     await callback.message.edit_text(f"<b>Вы завершили тест по странам континента"
-                                     f" {continent} ⛰. Правильных ответов - "
-                                     f"{correct_questions} ✅. Всего вопросов - "
-                                     f"{len(Test.all_states_names[1:-1])}.</b>")
+                                     f" {continent} ⛰\nПравильных ответов - "
+                                     f"{correct_questions} ✅\nВсего вопросов - "
+                                     f"{len(Test.all_states_names[1:-1])} ❔</b>")
     await state.reset_state()
 
 
-@dp.callback_query_handler(state=Test.all_states[1:], text="next_question")
+@dp.callback_query_handler(text="next_question", state=Test.all_states[1:])
 async def next_question(callback: types.CallbackQuery, state: FSMContext):
     await start_question(callback, state)
 

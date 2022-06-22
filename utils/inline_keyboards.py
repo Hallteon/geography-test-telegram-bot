@@ -14,6 +14,7 @@ continents = list(geo_data.keys())
 
 main_menu = InlineKeyboardMarkup()
 main_menu.insert(InlineKeyboardButton(text="Выбрать континент 🏔", callback_data="choice"))
+main_menu.insert(InlineKeyboardButton(text="Выйти ⬅", callback_data="exit"))
 
 choice_menu = InlineKeyboardMarkup()
 

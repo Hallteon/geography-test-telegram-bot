@@ -2,7 +2,8 @@ import random
 
 from aiogram.dispatcher import FSMContext
 
-from utils.create_flages_emojies import create_flag
+from utils.db_utils.db_functions import set_max_continent_points
+from utils.misc.create_flages_emojies import create_flag
 from utils.inline_keyboards import main_menu, choice_menu, geo_data, next_menu, create_question_menu, start_menu
 
 from aiogram import types
@@ -10,7 +11,7 @@ from aiogram.dispatcher.filters import Command
 from loader import dp
 
 from states import Test
-from utils.throttling import rate_limit
+from utils.misc.throttling import rate_limit
 
 
 @rate_limit(5)
@@ -116,6 +117,8 @@ async def return_results(callback: types.CallbackQuery, state: FSMContext):
                                      f" {continent} ⛰\nПравильных ответов - "
                                      f"{correct_questions} ✅\nВсего вопросов - "
                                      f"{len(Test.all_states_names[1:-1])} ❔</b>")
+    await set_max_continent_points(callback.from_user.id, continent, correct_questions)
+
     await state.reset_state()
 
 

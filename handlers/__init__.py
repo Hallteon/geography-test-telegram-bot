@@ -1,2 +1,2 @@
-from . import testing_handlers
-from . import standart_handlers
+from . import users
+from . import admins

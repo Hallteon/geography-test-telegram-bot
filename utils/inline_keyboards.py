@@ -3,9 +3,9 @@ import random
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.callback_data import CallbackData
 
-from data.continents_data import continents_data
+from utils.misc.continents_data import data_continents
 
-geo_data = continents_data
+geo_data = data_continents
 
 choice_callback_data = CallbackData("choice_continent", "continent")
 question_callback_data = CallbackData("question", "type")

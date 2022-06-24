@@ -4,3 +4,4 @@ requests==2.28.0
 lxml==4.9.0
 pycountry==22.3.5
 translate==3.6.1
+psycopg2==2.9.3

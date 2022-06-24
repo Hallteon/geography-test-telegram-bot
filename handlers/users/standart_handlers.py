@@ -1,8 +1,8 @@
 from aiogram import types
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 
-from filters import IsInStatesGroup
 from loader import dp, bot
+from utils.db_utils.db_functions import create_user_record
 
 
 @dp.message_handler(CommandStart())
@@ -16,6 +16,7 @@ async def bot_start(message: types.Message):
            f"чтобы увидеть доступные команды этого бота ✅</b>"
 
     await message.answer(text)
+    await create_user_record(message.from_user.id, message.from_user.username)
 
 
 @dp.message_handler(CommandHelp())

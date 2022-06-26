@@ -5,3 +5,4 @@ lxml==4.9.0
 pycountry==22.3.5
 translate==3.6.1
 psycopg2==2.9.3
+environs==9.5.0

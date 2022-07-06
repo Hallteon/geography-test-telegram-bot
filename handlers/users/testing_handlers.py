@@ -48,16 +48,17 @@ async def start_test(callback: types.CallbackQuery, state: FSMContext):
         data_test["continent"] = continent
         data_test["countries"] = countries
         data_test["correct"] = 0
+        data_test["counter"] = 0
 
     await Test.next()
 
 
-@dp.callback_query_handler(text="back", state=Test.Q1)
+@dp.callback_query_handler(text="back", state=Test.question)
 async def back_to_menu(callback: types.CallbackQuery, state: FSMContext):
     await choice_continent(callback)
 
 
-@dp.callback_query_handler(state=Test.all_states[1:-1], text="start_question")
+@dp.callback_query_handler(state=Test.question, text="start_question")
 async def start_question(callback: types.CallbackQuery, state: FSMContext):
     data_test = await state.get_data()
 
@@ -71,8 +72,7 @@ async def start_question(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         data["country"] = country
         data["countries"] = all_countries
-
-    await Test.next()
+        data["counter"] += 1
 
 
 @dp.callback_query_handler(text_contains="question:correct", state=Test.all_states[1:])
@@ -90,6 +90,9 @@ async def correct_question(callback: types.CallbackQuery, state: FSMContext):
         del data["countries"][country]
         data["correct"] += 1
 
+    if data["counter"] == 3:
+        await state.set_state(Test.result)
+
 
 @dp.callback_query_handler(text_contains="question:incorrect", state=Test.all_states[1:])
 async def incorrect_question(callback: types.CallbackQuery, state: FSMContext):
@@ -105,6 +108,9 @@ async def incorrect_question(callback: types.CallbackQuery, state: FSMContext):
     async with state.proxy() as data:
         del data["countries"][country]
 
+    if data["counter"] == 3:
+        await state.set_state(Test.result)
+
 
 @dp.callback_query_handler(state=Test.result)
 async def return_results(callback: types.CallbackQuery, state: FSMContext):
@@ -116,7 +122,7 @@ async def return_results(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text(f"<b>Вы завершили тест по странам континента"
                                      f" {continent} ⛰\nПравильных ответов - "
                                      f"{correct_questions} ✅\nВсего вопросов - "
-                                     f"{len(Test.all_states_names[1:-1])} ❔</b>")
+                                     f"{data_test['counter']} ❔</b>")
     await set_max_continent_points(callback.from_user.id, continent, correct_questions)
 
     await state.reset_state()
